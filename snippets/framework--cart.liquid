@@ -1,0 +1,340 @@
+{% comment %} translations {% endcomment %}
+{% assign your_cart_t = 'cart.your_cart' | t %}
+{% assign price_t = 'cart.price' | t %}
+{% assign quantity_t = 'cart.quantity' | t %}
+{% assign total_t = 'cart.total' | t %}
+{% assign subtotal_t = 'cart.subtotal' | t %}
+{% assign remove_t = 'cart.remove' | t %}
+{% assign order_notes_t = 'cart.order_notes' | t %}
+{% assign shipping_taxes_t = 'cart.shipping_taxes_notification' | t %}
+{% assign continue_t = 'cart.continue' | t %}
+{% assign checkout_t = 'cart.checkout' | t %}
+{% assign empty_html_t = 'cart.empty_html' | t %}
+
+{% assign has_items = false %}
+{% if cart.item_count > 0 %}
+  {% assign has_items = true %}
+{% endif %}
+
+<div
+  class="cart--root"
+  data-view="{{ view }}"
+  data-js-class="Cart"
+  data-has-items="{{ has_items }}"
+>
+  <div class="cart--header">
+    <h2 class="cart--title font--section-heading">{{ your_cart_t }}</h2>
+  </div>
+  <form  class="cart--form" action="/cart" method="post" novalidate="">
+
+    {% case view %}
+      {% when 'desktop' %}
+        <div class="cart--body">
+          <div class="cart--headings font--accent">
+            <div class="cart--heading--image"></div>
+            <div class="cart--heading--title"></div>
+            <div class="cart--heading--price">{{ price_t }}</div>
+            <div class="cart--heading--quantity">{{ quantity_t }}</div>
+            <div class="cart--heading--total">{{ total_t }}</div>
+          </div>
+
+          {% comment %} <div class="cart--items"> {% endcomment %}
+          {% for item in cart.items %}
+            {% capture item_image %}
+              {% include "framework--image", image: item.image %}
+            {% endcapture %}
+
+            <div
+              class="cart--item"
+              data-variant-id="{{ item.variant_id }}"
+              data-item-key="{{ item.key }}"
+            >
+              <div class="cart--item--image">
+                <a href="{{ item.url }}">
+                  {{ item_image }}
+                </a>
+              </div>
+
+              <div class="cart--item--title">
+                <div class="font--block-heading">
+                  <a href="{{ item.url }}">{{ item.product.title }}</a>
+                </div>
+
+                {% unless item.variant.title contains 'Default' %}
+                  <div class="font--paragraph">
+                    <a href="{{ item.url }}">{{ item.variant.title }}</a>
+                  </div>
+                {% endunless %}
+
+                {% if item.selling_plan_allocation != empty  %}
+  <span class="selling-plan-details" data-bsub-item-key="{{item.key}}">
+    {{item.selling_plan_allocation.selling_plan.name}}
+  </span>
+{% endif %}
+                
+                {% assign property_size = item.properties | size %}
+                {% if property_size > 0 %}
+                  {% for p in item.properties %}
+                    {% unless p.last == blank %}
+                      <br>
+                      {{ p.first }}:
+                      {% comment %} Check if there was an uploaded file associated {% endcomment %}
+                      {% if p.last contains '/uploads/' %}
+                        <a href="{{ p.last }}">{{ p.last | split: '/' | last }}</a>
+                      {% else %}
+                        {{ p.last }}
+                      {% endif %}
+                    {% endunless %}
+                  {% endfor %}
+                {% endif %}
+              </div>
+
+              <div class="cart--item--price font--accent">
+                {% if item.original_price != item.final_price %}
+                  <div class="font--light-accent">
+                    <s class="money">{{ item.original_price | money }}</s>
+                  </div>
+                {% endif %}
+
+                <div class="font--accent money">{{ item.final_price | money }}</div>
+
+                {% if item.line_level_discount_allocations.size > 0 %}
+                  <div class="font--light-accent money">
+                    {% for discount_allocation in item.line_level_discount_allocations %}
+                      {{ discount_allocation.discount_application.title }} (-{{ discount_allocation.amount | money }})
+                    {% endfor %}
+                  </div>
+                {% endif %}
+              </div>
+
+              <div class="cart--item--quantity">
+                <div class="cart--quantity--container input--number">
+                  <a
+                    tabindex="0"
+                    aria-label="minus"
+                    class="minus"
+                    href="/cart/change?line={{ forloop.index }}&quantity={{ item.quantity | minus: 1}}"
+                  >
+                    {% include 'snippet-symbol' with 'minus' %}
+                  </a>
+                  <input
+                    class="cart--quantity--input"
+                    type="text"
+                    name="updates[]"
+                    id="updates_{{ item.id }}"
+                    value="{{ item.quantity }}"
+                    min="1"
+                    pattern="[1-9]*"
+                    data-loading="false"
+                  />
+                  <a
+                    class="plus"
+                    tabindex="0"
+                    aria-label="plus"
+                    href="/cart/change?line={{ forloop.index }}&quantity={{ item.quantity | plus: 1}}"
+                  >
+                    {% include 'snippet-symbol' with 'plus' %}
+                  </a>
+                </div>
+
+                <div class="cart--item--remove font--block-link">
+                  <a
+                    href="/cart/change?line={{ forloop.index }}&quantity=0"
+                    class="remove"
+                    aria-label="{{ remove_t }}"
+                    title="{{ remove_t }}"
+                  >
+                    {{ remove_t }}
+                  </a>
+                </div>
+              </div>
+
+              <div class="cart--item--total font--accent">
+                {% if item.original_line_price != item.final_line_price %}
+                  <div class="font--light-accent">
+                    <s class="money">{{ item.original_line_price | money }}</s>
+                  </div>
+                {% endif %}
+
+                <div class="money">
+                  {{ item.final_line_price | money }}
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+
+      {% when 'mobile' %}
+        <div class="cart--body">
+          {% comment %} <div class="cart--items"> {% endcomment %}
+          {% for item in cart.items %}
+            {% capture item_image %}
+              {% include "framework--image", image: item.image %}
+            {% endcapture %}
+
+            <div
+              class="cart--item"
+              data-variant-id="{{ item.variant_id }}"
+              data-item-key="{{ item.key }}"
+            >
+              <div class="cart--item--title">
+                <div class="font--block-heading">
+                  <a href="{{ item.url }}">{{ item.product.title }}</a>
+                </div>
+              </div>
+
+              <div class="cart--item--image">
+                <a href="{{ item.url }}">
+                  {{ item_image }}
+                </a>
+              </div>
+
+              <div class="cart--item--info">
+                {% unless item.variant.title contains 'Default' %}
+                  <div class="font--paragraph">
+                    <a href="{{ item.url }}">{{ item.variant.title }}</a>
+                  </div>
+                {% endunless %}
+
+                {% assign property_size = item.properties | size %}
+                {% if property_size > 0 %}
+                  <div class="cart--item-properties">
+                  {% for p in item.properties %}
+                    {% unless p.last == blank %}
+                      <br>
+                      {{ p.first }}:
+                      {% comment %} Check if there was an uploaded file associated {% endcomment %}
+                      {% if p.last contains '/uploads/' %}
+                        <a href="{{ p.last }}">{{ p.last | split: '/' | last }}</a>
+                      {% else %}
+                        {{ p.last }}
+                      {% endif %}
+                    {% endunless %}
+                  {% endfor %}
+                  </div>
+                {% endif %}
+
+                <div class="cart--item--price">
+                  {% if item.original_line_price > item.final_line_price %}
+                    <div class="cart--item--orig-price font--light-accent">
+                      <s class="money">{{ item.original_line_price | money }}</s>
+                    </div>
+                  {% endif %}
+
+                  <div class="cart--item--total font--accent money">
+                    {{ item.final_line_price | money }}
+                  </div>
+
+                  {% if item.line_level_discount_allocations.size > 0 %}
+                    <div class="cart--item--discounts font--light-accent">
+                      {% for discount_allocation in item.line_level_discount_allocations %}
+                        {{ discount_allocation.discount_application.title }}&nbsp;
+                        (–<span class="money">{{ discount_allocation.amount | money }}</span>)
+                      {% endfor %}
+                    </div>
+                  {% endif %}
+                </div>
+
+                <div class="cart--item--quantity">
+                  <div class="cart--quantity--container input--number">
+                    <a
+                      tabindex="0"
+                      aria-label="minus"
+                      class="minus"
+                      href="/cart/change?line={{ forloop.index }}&quantity={{ item.quantity | minus: 1}}"
+                    >
+                      {% include 'snippet-symbol' with 'minus' %}
+                    </a>
+                    <input
+                      class="cart--quantity--input"
+                      type="text"
+                      name="updates[]"
+                      id="updates_{{ item.id }}"
+                      value="{{ item.quantity }}"
+                      min="1"
+                      pattern="[1-9]*"
+                      data-loading="false"
+                    />
+                    <a
+                      class="plus"
+                      tabindex="0"
+                      aria-label="plus"
+                      href="/cart/change?line={{ forloop.index }}&quantity={{ item.quantity | plus: 1}}"
+                    >
+                      {% include 'snippet-symbol' with 'plus' %}
+                    </a>
+                  </div>
+
+                  <div class="cart--item--remove font--block-link">
+                    <a
+                      href="/cart/change?line={{ forloop.index }}&quantity=0"
+                      class="remove"
+                      aria-label="{{ remove_t }}"
+                      title="{{ remove_t }}"
+                    >
+                      {{ remove_t }}
+                    </a>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+    {% endcase %}
+
+    <div class="cart--footer">
+      {% if settings.cart--show-note %}
+        <div class="cart--notes">
+          <label class="cart--notes--heading">{{ order_notes_t }}</label>
+          <textarea class="cart--notes--textarea" name="note">{{ note }}</textarea>
+        </div>
+      {% endif %}
+      <div class="cart--totals">
+        {%- if cart.cart_level_discount_applications != blank -%}
+          <div class="cart--sub-total">
+            <div class="font--block-heading">{{ subtotal_t }}</div>
+            <div class="font--accent money">{{ cart.items_subtotal_price | money }}</div>
+          </div>
+
+          <div class="cart--discounts">
+            <ul>
+            {%- for discount_application in cart.cart_level_discount_applications -%}
+              <li>
+                <div class="font--accent">{{ discount_application.title }}</div>
+                <span class="font--light-accent">
+                  –<span class="money">{{ discount_application.total_allocated_amount | money }}
+                  </span>
+                </span>
+              </li>
+            {%- endfor -%}
+            </ul>
+          </div>
+        {%- endif -%}
+        <!-- Final cart total -->
+        <div class="cart--total">
+          <div class="font--block-heading">{{ total_t }}</div>
+          <div class="cart--total--price font--accent money">{{ cart.total_price | money }}</div>
+        </div>
+
+        <div class="cart--tax-info font--paragraph">
+          {{ shipping_taxes_t }}
+        </div>
+
+        <div class="cart--nav">
+          <div class="cart--continue-shopping font--block-link">
+            <a href="{{ shop.url }}/collections/all">
+              {{ continue_t }}
+            </a>
+          </div>
+
+          <button class="cart--checkout-button font--button" type="submit" name="checkout">
+            {{ checkout_t }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </form>
+
+  <div class="cart--no-items font--paragraph">{{ empty_html_t }}</div>
+</div>

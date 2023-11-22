@@ -1,0 +1,80 @@
+{% comment %} Defaults {% endcomment %}
+{% assign view = 'title-below' %}
+{% assign onboarding = false %}
+{% assign article_has_image = false %}
+
+{% if onboarding %}
+  {% assign title = 'home.featured_blog.article.title' | t %}
+  {% assign url = '#' %}
+  {% assign excerpt = 'home.featured_blog.article.excerpt' | t %}
+  {% assign article_has_image = true %}
+
+  {% capture image %}
+    {%
+      include "framework--placeholder",
+      type: "image",
+      aspect_ratio: 1.45
+    %}
+  {% endcapture %}
+
+{% else %}
+  {% assign title = article.title %}
+  {% assign url = article.url %}
+  {% assign excerpt = article.excerpt_or_content | strip_html | truncate: 190 %}
+
+  {% if article.image %}
+    {% if view == 'featured' %}
+      {% assign medium_width = 570 %}
+    {% else %}
+      {% assign medium_width = 350 %}
+    {% endif %}
+
+    {% capture image %}
+      {%
+        include "framework--image",
+        image: article.image
+      %}
+    {% endcapture %}
+
+    {% assign article_has_image = true %}
+  {% endif %}
+
+{% endif %}
+
+<div
+  class="article"
+  data-article--view="{{ view }}"
+  data-article--has-image="{{ article_has_image }}"
+>
+  {% case view %}
+
+    {% when 'featured' %}
+      {% if article_has_image %}
+        <div class="article--image"><a href="{{ url }}">{{ image }}</a></div>
+      {% endif %}
+
+      <div class="article--text-wrapper">
+        <h3 class="article--title"><a href="{{ url }}">{{ title }}</a></h3>
+        <div class="article--excerpt">{{ excerpt }}</div>
+        <a class="article--view-more" href="{{ url }}" >{{ 'blog.article.read_more' | t }}</a>
+      </div>
+
+    {% when 'title-aside' %}
+
+      {% if article_has_image %}
+        <div class="article--image"><a href="{{ url }}">{{ image }}</a></div>
+      {% endif %}
+
+      <h3 class="article--title"><a href="{{ url }}">{{ title }}</a></h3>
+
+    {% when 'title-below' %}
+
+      {% if article_has_image %}
+        <div class="article--image"><a href="{{ url }}">{{ image }}</a></div>
+      {% endif %}
+
+      <h3 class="article--title"><a href="{{ url }}">{{ title }}</a></h3>
+
+  {% endcase %}
+
+</div>

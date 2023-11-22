@@ -1,0 +1,143 @@
+{% comment %} Defaults {% endcomment %}
+{% assign view = 'grid' %}
+{% assign onboarding = false %}
+{% assign show-vendor = true  %}
+{% if settings.product--show-vendor == false %}
+  {% assign show-vendor = false %}
+{% endif %}
+{% assign cart-button = 'products.cart_button_text' | t %}
+
+{% if onboarding %}
+  {% capture image %}
+    {%
+      include "framework--placeholder",
+      type: "image",
+      aspect_ratio: 1
+    %}
+  {% endcapture %}
+  {% assign vendor = 'products.placeholder.vendor' | t %}
+  {% assign vendor-url = "#" %}
+  {% assign compare-price = 'products.placeholder.compare_price' | t %}
+  {% assign price = 'products.placeholder.actual_price' | t %}
+  {% assign title = 'products.placeholder.name' | t %}
+  {% assign url = product.url | within: collection %}
+  {% assign excerpt = 'products.description' | t %}
+{% else %}
+  {% capture image %}
+    {%
+      include 'framework--image',
+      image: product.featured_image,
+      full_width: true
+    %}
+  {% endcapture %}
+
+  {% assign vendor = product.vendor %}
+  {% assign vendor-url = product.vendor | url_for_vendor %}
+  {% if product.compare_at_price > product.price and product.available %}
+    {% assign compare-price = product.compare_at_price | money %}
+  {% else %}
+    {% assign compare-price = false %}
+  {% endif %}
+  {% assign price = product.price | money %}
+  {% assign title = product.title %}
+  {% assign url = product.url | within: collection %}
+  {% assign excerpt = product.metafields.global.description_tag | newline_to_br %}
+  {% if excerpt == blank %}
+
+    {% assign excerpt = product.description | strip_html | truncate: 155 | newline_to_br %}
+
+
+  {% endif %}
+
+  {% if product.available %}
+    {% assign product-sold-out = false %}
+  {% else %}
+    {% assign product-sold-out = true %}
+  {% endif %}
+{% endif %}
+
+<div class="product--root" data-product--view="{{ view }}">
+  {% case view %}
+
+    {% when 'grid' %}
+      <div class="product--image-wrapper">
+        <div class="product--image"><a href="{{ url }}">{{ image }}</a></div>
+      </div>
+      <div class="product--details">
+        {% if product-sold-out %}
+          <div class="product--sold-out font--accent">{{ 'collections.sold_out_html' | t }}</div>
+        {% endif %}
+
+        {% if show-vendor %}
+          <div class="product--vendor font--accent"><a href="{{ vendor-url }}">{{ vendor }}</a></div>
+        {% endif %}
+
+        <h3 class="product--title font--block-heading"><a href="{{ url }}">{{ title }}</a></h3>
+
+        <spark-product-card parent-id="{{ product.id }}"></spark-product-card>
+
+        <div data-spark="b2c-only" class="product--details--title-row">
+          <span class="product--price-wrapper">
+            {% if compare-price %}
+              <span class="product--compare-price font--light-accent">{{ compare-price }}</span>
+              <span class="product--price font--accent">{{ price }}</span>
+            {% else %}
+              {% if product.price_varies %}
+                <span class="product--from font--accent">{{ 'collections.from' | t }}</span>
+              {% endif %}
+              <span class="product--price font--accent">{{ price }}</span>
+            {% endif %}
+          </span>
+        </div> <!-- .product--details--title-row -->
+
+      </div>
+
+    {% when 'list' %}
+      <div class="product--image"><a href="{{ url }}">{{ image }}</a></div>
+      <div class="product--details">
+        {% if product-sold-out %}
+          <div class="product--sold-out font--accent">{{ 'collections.sold_out_html' | t }}</div>
+        {% endif %}
+
+
+       
+        <div  class="product--details--title-row">
+          <div data-spark="b2c-only" class="product--price-wrapper">
+            {% if compare-price %}
+              <span class="product--compare-price font--light-accent">{{ compare-price }}</span>
+              <span class="product--price font--accent">{{ price }}</span>
+            {% else %}
+              {% if product.price_varies %}
+                <span class="product--from font--accent">{{ 'collections.from' | t }}</span>
+              {% endif %}
+              <span class="product--price font--accent">{{ price }}</span>
+            {% endif %}
+          </div>
+          <h3 class="product--title font--block-heading"><a href="{{ url }}">{{ title }}</a></h3>
+        </div> <!-- .product--details--title-row -->
+
+        {%- if customer.metafields.sparklayer.authentication -%}
+          <div style="margin: 0 0 1em">
+            
+         <spark-product-card parent-id="{{ product.id }}"></spark-product-card>
+          </div>
+{%- endif -%}
+
+
+        {% if show-vendor %}
+          <div class="product--vendor font--accent"><a href="{{ vendor-url }}">{{ vendor }}</a></div>
+        {% endif %}
+
+        {% if excerpt.size > 0 %}
+          <div class="product--excerpt font--paragraph">{{ excerpt }}</div>
+        {% endif %}
+{% comment %}
+        {% if settings.product--show-quick-add-buttons and product-sold-out == false %}
+          {% include 'partial--quick-add' %}
+        {% endif %}
+        {% endcomment %}
+
+      </div>
+
+  {% endcase %}
+</div>

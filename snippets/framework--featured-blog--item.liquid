@@ -1,0 +1,79 @@
+{% assign featured_article = article %}
+
+<div class="featured-blog--item">
+
+	{% case type %}
+
+		{% when 'full_article' %}
+
+			{% if featured_article.image %}
+				<div class="featured-blog--item--image">
+					{%
+						include "framework--image",
+						image: featured_article.image,
+						full_width: true
+					%}
+				</div>
+			{% endif %}
+
+			<h3 class="featured-blog--item--heading font--block-heading">
+				<a href="{{ featured_article.url }}">{{ featured_article.title }}</a>
+			</h3>
+
+			{% if show_date %}
+				<div class="featured-blog--item--date font--light-accent">
+					{% comment %} 'timesince' requires passing 'created_at' {% endcomment %}
+					{%
+						include "framework--utils",
+						utility: "timesince",
+						created_at: featured_article.published_at
+					%}
+				</div>
+			{% endif %}
+
+			{% if show_excerpt %}
+				<div class="featured-blog--item--excerpt font--paragraph">
+					{% if featured_article.excerpt == blank %}
+						{{ featured_article.content | strip_html | truncate: 100 }}
+					{% else %}
+						{{ featured_article.excerpt }}
+					{% endif %}
+				</div>
+			{% endif %}
+
+			<div class="featured-blog--item--read-more font--block-link">
+				<a href="{{ featured_article.url }}">{{ featured_blog_read_more_t }}</a>
+			</div>
+
+		{% when 'placeholder' %}
+
+			<div class="featured-blog--item--image">
+				{%
+					include "framework--placeholder",
+					type: "image"
+				%}
+			</div>
+
+			<h3 class="featured-blog--item--heading font--block-heading">
+				{{ featured_blog_item_title_t }}
+			</h3>
+
+			{% if show_date %}
+				<div class="featured-blog--item--date font--light-accent">
+					{{ featured_blog_date_t }}
+				</div>
+			{% endif %}
+
+			{% if show_excerpt %}
+				<div class="featured-blog--item--excerpt font--paragraph">
+					{{ featured_blog_excerpt_t }}
+				</div>
+			{% endif %}
+
+			<div class="featured-blog--item--read-more font--block-link">
+				<a>{{ featured_blog_read_more_t }}</a>
+			</div>
+
+	{% endcase %}
+
+</div>

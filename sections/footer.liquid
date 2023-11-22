@@ -1,0 +1,92 @@
+{% unless section.settings.hide-on-index and template contains 'index' %}
+  <footer
+    class="footer"
+    data-section-id="{{ section.id }}"
+    data-section-type="footer"
+    data-js-class="Footer"
+  >
+    {% assign menu = section.settings.menu %}
+
+    <div class="footer--left-column">
+      {% if linklists[menu].links.size > 0 %}
+        <ul class="footer--menu font--accent" role="navigation" aria-label="Secondary">
+          {% for link in linklists[section.settings.menu].links %}
+            <li class="footer--list-item">
+              <a href="{{ link.url }}" title="{{ link.title }}">{{ link.title }}</a>
+            </li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+
+      {% unless shop.enabled_payment_types == empty %}
+        {% if section.settings.show-payment-icons %}
+          {% include 'framework--payment-icons' %}
+        {% endif %}
+      {% endunless %}
+    </div>
+
+    {% if settings.popup--enabled %}
+      <div class="footer--middle-column font--block-link">
+        <a href="#" class="popup--open">{{ 'general.mailing_list.link' | t }}</a>
+      </div>
+    {% endif %}
+
+    <div class="footer--right-column">
+      {% if section.settings.show-copyright %}
+        <span class="font--small">&copy; {{ 'now' | date: '%Y' }} {{ shop.name | link_to: '/' }}.</span>
+      {% endif %}
+
+      {% assign powered_check =  powered_by_link | split: '>' %}
+      {% if powered_check[1] != ' </a' %}
+        <span class="font--small">
+          <a href="https://troopthemes.com" rel="nofollow">Theme by Troop</a> | {{ powered_by_link }}
+        </span>
+      {% endif %}
+
+      {% if section.settings.show-social-icons %}
+        <div class="footer--social-icons">
+          {% include 'partial--social-media' with 'footer' %}
+        </div>
+      {% endif %}
+    </div>
+  </footer>
+{% endunless %}
+
+{% schema %}
+{
+  "name": "Footer",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "hide-on-index",
+      "label": "Hide on homepage",
+      "default": false
+    },
+    {
+      "type": "link_list",
+      "id": "menu",
+      "label": "Menu",
+      "default": "footer",
+      "info": "This menu won't show submenu items."
+    },
+    {
+      "type": "checkbox",
+      "id": "show-copyright",
+      "label": "Show copyright text",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "show-payment-icons",
+      "label": "Show payment icons",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "show-social-icons",
+      "label": "Show social icons",
+      "default": false
+    }
+  ]
+}
+{% endschema %}

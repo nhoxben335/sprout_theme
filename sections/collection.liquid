@@ -1,0 +1,180 @@
+{% assign is_vendor_page = false %}
+{% if collection.all_products_count > 0 and collection.products.first.vendor == collection.title %}
+{% assign is_vendor_page = true %}
+{% endif %}
+
+{% assign collection_tags_exist = false %}
+
+{% if collection.tags.size > 0 and section.settings.show-tag-filters %}
+  {% assign collection_tags_exist = true %}
+{% endif %}
+
+{% paginate collection.products by 24 %}
+
+<div
+  class="collection"
+  data-section-id="{{ section.id }}"
+  data-section-type="collection_page"
+  data-collection--tags-exist="{{ collection_tags_exist }}"
+  data-collection--is-vendor-page="{{ is_vendor_page }}"
+  data-js-class="CollectionPage"
+>
+
+  <header class="collection--header">
+    <div class="collection--title">
+      <h1 class="font--section-heading">{{ collection.title }}</h1>
+      {% unless collection.description == blank %}
+        <p class="font--paragraph">{{ collection.description }}</p>
+      {% endunless %}
+    </div>
+
+    {% if collection.image %}
+      <div class="collection--image">
+        {%
+          include "framework--image",
+          image: collection.image
+        %}
+      </div>
+    {% endif %}
+  </header>
+
+  {% if collection_tags_exist %}
+    <select class="collection--filter--select">
+      <option value="/collections/{{ collection.handle }}">
+        {{ 'collections.filter' | t | upcase }}
+        ({{ collections[collection.handle].products_count }})
+      </option>
+      {% for tag in collections[collection.handle].tags %}
+        <option value="/collections/{{ collection.handle }}/{{ tag | handleize }}"
+          {% if current_tags contains tag %}selected{% endif %}>{{ tag }}
+
+          {% assign tag_count = 0 %}
+          {% for product in collections[collection.handle].products  %}
+{%- comment -%} Wholesale Gorilla: do not delete unless app is uninstalled{%- endcomment -%}
+{%- assign wsgTempProd = product -%}{%- assign wsgExclude = false -%}{%- if forloop.first == true -%}{%- assign wsgActive = false -%}{%- assign wsgActiveCustomer = false -%}
+{%- include 'wsg-status' wsgStatusAction: 'init' | strip -%}{%- endif -%}{%- if wsgActive -%}{%- include 'wsg-status' wsgStatusAction: 'col-item' | strip -%}{%- endif -%}{%- if wsgExclude -%} {%- continue -%} {%- endif -%}
+{%- comment -%} end WSG {%- endcomment -%}
+            {% if product.tags contains tag %}
+              {% assign tag_count = tag_count | plus: 1 %}
+            {% endif %}
+          {% endfor %}
+
+          ({{ tag_count }})
+        </option>
+      {% endfor %}
+    </select>
+  {% endif %}
+
+  {% if collection.products.size < 1  %}
+    <div class="collection--no-products rte-content">
+      {{ 'collections.no_products_feedback_html' | t }}
+    </div>
+  {% endif %}
+
+  <div class="collection--column-wrapper">
+    {% if collection_tags_exist and is_vendor_page == false %}
+      <div class="collection--left-column">
+        <nav class="collection--filters">
+          <ul class="collection--filter-tags font--accent">
+            <li class="collection--filter-tag">
+              <a
+                class="
+                  collection--filter-tag--anchor
+                  {% if current_tags == blank %}collection--filter-tag--selected{% endif %}"
+                href="/collections/{{ collection.handle}}">{{ 'collections.all' | t }}
+                <span class="collection--number-of-items">
+                  ({{ collections[collection.handle].products_count }})
+                </span>
+              </a>
+            </li>
+
+            {% for tag in collections[collection.handle].tags %}
+              <li class="collection--filter-tag">
+                <a
+                  class="
+                    collection--filter-tag--anchor
+                    {% if current_tags contains tag %}collection--filter-tag--selected{% endif %}"
+                  href="/collections/{{ collection.handle }}/{{ tag | handleize }}">
+                  {{ tag | handleize }}
+                  <span class="collection--number-of-items">
+
+                    {% assign tag_count = 0 %}
+                    {% for product in collections[collection.handle].products  %}
+{%- comment -%} Wholesale Gorilla: do not delete unless app is uninstalled{%- endcomment -%}
+{%- assign wsgTempProd = product -%}{%- assign wsgExclude = false -%}{%- if forloop.first == true -%}{%- assign wsgActive = false -%}{%- assign wsgActiveCustomer = false -%}
+{%- include 'wsg-status' wsgStatusAction: 'init' | strip -%}{%- endif -%}{%- if wsgActive -%}{%- include 'wsg-status' wsgStatusAction: 'col-item' | strip -%}{%- endif -%}{%- if wsgExclude -%} {%- continue -%} {%- endif -%}
+{%- comment -%} end WSG {%- endcomment -%}
+                      {% if product.tags contains tag %}
+                        {% assign tag_count = tag_count | plus: 1 %}
+                      {% endif %}
+                    {% endfor %}
+
+                    ({{ tag_count }})
+                  </span>
+                </a>
+              </li>
+            {% endfor %}
+          </ul>
+        </nav> <!-- .collection--filters -->
+      </div> <!-- .collection--left-column -->
+    {% endif %}
+
+    <div class="collection--right-column">
+      <div class="collection--products">
+        {% if current_tags.size > 0 %}
+          {% for product in collection.products %}
+{%- comment -%} Wholesale Gorilla: do not delete unless app is uninstalled{%- endcomment -%}
+{%- assign wsgTempProd = product -%}{%- assign wsgExclude = false -%}{%- if forloop.first == true -%}{%- assign wsgActive = false -%}{%- assign wsgActiveCustomer = false -%}
+{%- include 'wsg-status' wsgStatusAction: 'init' | strip -%}{%- endif -%}{%- if wsgActive -%}{%- include 'wsg-status' wsgStatusAction: 'col-item' | strip -%}{%- endif -%}{%- if wsgExclude -%} {%- continue -%} {%- endif -%}
+{%- comment -%} end WSG {%- endcomment -%}
+            {% for tag in product.tags %}
+              {% if current_tags contains tag %}
+                <div class="collection--product">
+                  {% include 'partial--product', view: 'list' %}
+                </div>
+              {% endif %}
+            {% endfor %}
+          {% endfor %}
+        {% else %}
+          {% for product in collection.products %}
+{%- comment -%} Wholesale Gorilla: do not delete unless app is uninstalled{%- endcomment -%}
+{%- assign wsgTempProd = product -%}{%- assign wsgExclude = false -%}{%- if forloop.first == true -%}{%- assign wsgActive = false -%}{%- assign wsgActiveCustomer = false -%}
+{%- include 'wsg-status' wsgStatusAction: 'init' | strip -%}{%- endif -%}{%- if wsgActive -%}{%- include 'wsg-status' wsgStatusAction: 'col-item' | strip -%}{%- endif -%}{%- if wsgExclude -%} {%- continue -%} {%- endif -%}
+{%- comment -%} end WSG {%- endcomment -%}
+            <div class="collection--product">
+              {% include 'partial--product', view: 'list' %}
+            </div>
+          {% endfor %}
+        {% endif %}
+      </div>
+
+
+      {% if paginate.pages > 1 %}
+        <footer class="collection--pagination">
+          <div class="width--12 text-align--center">
+            {% include 'framework--pagination' %}
+          </div>
+        </footer>
+        <div class="spacing--3y"></div>
+      {% endif %}
+
+    </div> <!-- .collection--right-column -->
+  </div> <!-- .collection--column-wrapper -->
+</div>
+
+
+{% endpaginate %}
+
+{% schema %}
+{
+  "name": "Collection page",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "show-tag-filters",
+      "label": "Show tag filters",
+      "default": true
+    }
+  ]
+}
+{% endschema %}

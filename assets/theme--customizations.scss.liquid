@@ -1,0 +1,225 @@
+@mixin mobile {
+  @media only screen and (max-width: 767px) {
+    @content;
+  }
+}
+
+@mixin desktop {
+  @media only screen and (min-width: 768px) {
+    @content;
+  }
+}
+
+{% comment %}
+
+Here's an example of a customization
+You can paste this at the bottom of the page to see how it works
+
+/* Author - Date - Customization */
+/* E.g. Troop Themes - 12th November .... - Changed paragraph colors */
+.font--paragraph, body {
+  @include mobile {
+    color: blue;
+  }
+
+  @include desktop {
+    color: green;
+  }
+}
+
+{% endcomment %}
+
+/* Add your theme customizations below */
+{% comment %}
+.font--featured-heading,
+.font--featured-heading * {
+  color: yellow !important;
+}
+
+.font--section-heading,
+.font--section-heading * {
+  color: blue !important;
+}
+
+.font--block-heading,
+.font--block-heading * {
+  color: red !important;
+}
+
+.font--accent,
+.font--accent * {
+  color: orange !important;
+}
+
+.font--light-accent,
+.font--light-accent * {
+  color: pink !important;
+}
+
+.font--block-link,
+.font--block-link * {
+  color: purple !important;
+}
+
+.font--paragraph,
+.font--paragraph * {
+  color: green !important;
+}
+ {% endcomment %}
+
+
+
+/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+/* John Newgard's Customizations Start Here
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+
+/* make Collection thumbnails bigger on mobile
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+.featured-collection--item {
+width: 100% !important;
+}
+
+
+.product--details {
+  text-align:center !important;
+}
+
+@media only screen and (min-width: 768px) {
+  .product--details {
+    text-align:center !important;
+  }
+}
+#shopify-section-collection .product--details {
+  text-align:left !important;
+}
+
+@media only screen and (min-width: 768px) {
+  #shopify-section-collection .product--details {
+    text-align:left !important;
+  }
+}
+
+/* Change slideshow caption typography
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+.caption .font--section-heading {
+  color:#353F0B !important;
+}
+.caption .slideshow--button a {
+  background-color:#52bc9e !important;
+}
+.caption .font--button {
+  color:#ffffff !important;
+  letter-spacing: .01em !important;
+}
+
+
+/* Make header smaller
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+.header{
+  padding: 10px 48px 14px 48px !important;
+}
+@media only screen and (max-width: 768px) {
+  .header{
+    padding: 26px 16px 26px 16px !important;
+  }
+}
+
+.announcement--wrapper { 
+  padding: 10px 16px 10px 16px !important;
+}
+
+
+/* Announcement bar background colour
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+.announcement--link--full-width {
+background-color: #3f8984 !important;
+}
+
+
+/* Allows for longer single-line titles on slideshow overlays
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+.section--slideshow .slider .slide .caption {
+  padding: 32px 24px !important;
+}
+
+
+
+
+
+/* Damien Bradshaw's edit: overrides settings set in dashboard
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+h1 {
+  font-family: ff-tisa-sans, sans-serif;
+}
+
+
+h1,h2,h3 {
+  letter-spacing: 0em !important;
+}
+
+h2 {
+  font-size:2em !important;
+}
+
+/* Pop-Up */
+.popup--container {
+  opacity:0.8;
+}
+.popup--wrapper {
+  min-height: 160px;
+}
+
+
+
+#shopify-section-1599536499906 {
+  h2.title.font--section-heading {
+    font-size: 3em !important;
+  }
+  .font--paragraph {
+    font-size: 16px !important;
+    margin-right: 30px;
+  }
+}
+
+
+/* Wholesale Gorilla Form
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+/* login page */
+.wsg-proxy-container {
+  margin-top: 60px !important;
+}
+.wsg-proxy-container h1 {
+  font-weight: bold !important;
+}
+#wsg-login-message {
+  line-height: 1.8em;
+  padding: .5em 0 1em 0;
+  }
+#wsg-signup-link {
+  color: #49b7a7;
+}
+.wsg-proxy-container .hidden-label {
+  display:none;
+}
+.wsg-proxy-container #customer_email {
+  margin-top: 16px;
+}
+.wsg-proxy-container #customer_password {
+  margin-bottom: 20px;
+}
+/* sign-up page */
+#wsg-message {
+  line-height: 1.8em;
+  padding: .5em 0 1em 0;
+}
+.wsg-signup-link {
+  color: #49b7a7;
+  padding-bottom: 14px;
+}

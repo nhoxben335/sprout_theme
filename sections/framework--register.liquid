@@ -1,0 +1,63 @@
+<div class="customer--root">
+	<div id="customer-register" class="customer--register">
+
+		<h1 class="font--section-heading">
+			{{ 'customer.register.page_title' | t }}
+		</h1>
+
+		{% form 'create_customer' %}
+
+			{{ form.errors | default_errors }}
+
+			<div id="first_name">
+				<label for="first_name" class="label font--accent">{{ 'customer.register.first_name' | t }}</label>
+				<input type="text"
+							value=""
+							name="customer[first_name]"
+							id="first_name"
+							class="text"
+							size="30"
+							required />
+			</div>
+
+			<div id="last_name">
+				<label for="last_name" class="label font--accent">{{ 'customer.register.last_name' | t }}</label>
+				<input type="text"
+							value=""
+							name="customer[last_name]"
+							id="last_name"
+							class="text"
+							size="30"
+							required />
+			</div>
+
+			<div id="email">
+				<label for="email" class="label font--accent">{{ 'customer.register.email' | t }}</label>
+				<input type="email" value="" name="customer[email]" id="email" class="text" size="30" required />
+			</div>
+
+			<div id="password">
+				<label for="password" class="label font--accent">{{ 'customer.register.password' | t }}</label>
+				<input type="password"
+							value=""
+							name="customer[password]"
+							id="password"
+							class="password text"
+							size="30"
+							required />
+			</div>
+
+			<div class="account--button-container">
+				<input class="font--button account--create"
+							type="submit"
+							value="{{ 'customer.register.submit' | t }}" />
+					<a class="font--secondary-button account--login"
+						href="{{ shop.url }}/account/login">
+						{{ 'customer.register.login' | t }}
+					</a>
+			</div>
+
+		{% endform %}
+		
+	</div>
+</div>

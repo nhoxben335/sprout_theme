@@ -1,0 +1,7 @@
+<div class="product-unavailable spacing--3x font--size-1">
+  {% if product.variants.size > 1 %}
+    <p class="error">{{ 'products.sold_out.variant' | t }}</p>
+  {% else %}
+    <p class="error">{{ 'products.sold_out.product' | t }}</p>
+  {% endif %}
+</div>

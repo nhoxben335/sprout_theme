@@ -1,0 +1,88 @@
+{% if settings.typography--heading--size == 'large' %}
+  {% assign font--section-heading--size = '40px' %}
+  {% assign font--block-heading--size = '22px' %}
+{% elsif settings.typography--heading--size == 'medium' %}
+  {% assign font--section-heading--size = '32px' %}
+  {% assign font--block-heading--size = '20px' %}
+{% elsif settings.typography--heading--size == 'small' %}
+  {% assign font--section-heading--size = '24px' %}
+  {% assign font--block-heading--size = '18px' %}
+{% endif %}
+
+
+{% if settings.typography--heading--size == 'large' %}
+  {% assign font--section-heading--size = '28px' %}
+  {% assign font--block-heading--size = '20px' %}
+{% elsif settings.typography--heading--size == 'medium' %}
+  {% assign font--section-heading--size = '24px' %}
+  {% assign font--block-heading--size = '18px' %}
+{% elsif settings.typography--heading--size == 'small' %}
+  {% assign font--section-heading--size = '20px' %}
+  {% assign font--block-heading--size = '16px' %}
+{% endif %}
+
+{% if settings.typography--heading--uppercase %}
+  {% assign font--heading--uppercase = 'uppercase' %}
+{% else %}
+  {% assign font--heading--uppercase = 'normal' %}
+{% endif %}
+
+{% if settings.typography--paragraph--size == 'large' %}
+  {% assign font--paragraph--size = '18px' %}
+{% elsif settings.typography--paragraph--size == 'medium' %}
+  {% assign font--paragraph--size = '16px' %}
+{% elsif settings.typography--paragraph--size == 'small' %}
+  {% assign font--paragraph--size = '14px' %}
+{% endif %}
+
+<style>
+  {% assign font--heading = settings.typography--heading %}
+  {{ font--heading | font_face }}
+
+  {% assign font--heading--normal = font--heading | font_modify: 'weight', 'normal'  %}
+  {% if font--heading--normal %}{{ font--heading--normal | font_face }}{% endif %}
+
+  {% assign font--accent = settings.typography--accent %}
+  {{ font--accent | font_face }}
+
+  {% assign font--accent--bold = font--accent | font_modify: 'weight', 'bolder' %}
+  {% if font--accent--bold %}{{ font--accent--bold | font_face }}{% endif %}
+
+  {% assign font--paragraph = settings.typography--paragraph %}
+  {{ font--paragraph | font_face }}
+
+  {% assign font--paragraph--bold = font--paragraph | font_modify: 'weight', 'bolder' %}
+  {% if font--paragraph--bold %}{{ font--paragraph--bold | font_face }}{% endif %}
+
+  {% assign font--paragraph--italic = font--paragraph | font_modify: 'style', 'italic' %}
+  {% if font--paragraph--italic %}{{ font--paragraph--italic | font_face }}{% endif %}
+
+  {% assign font--paragraph--bold-italic = font--paragraph--bold | font_modify: 'style', 'italic' %}
+  {% if font--paragraph--bold-italic %}{{ font--paragraph--bold-italic | font_face }}{% endif %}
+</style>
+
+
+{% capture framework--css-variables %}
+  --font--section-heading--size: {{ font--section-heading--size }};
+  --font--block-heading--size: {{ font--block-heading--size }};
+  --font--heading--uppercase: {{ font--heading--uppercase }};
+  --font--paragraph--size: {{ font--paragraph--size }};
+
+  --font--heading--family: {{ font--heading.family }}, {{ font--heading.fallback_families }};
+  --font--heading--weight: {{ font--heading.weight | default: 400 }};
+  --font--heading--normal-weight: {{ font--heading--normal.weight | default: 400 }};
+  --font--heading--style: {{ font--heading.style }};
+
+  --font--accent--family: {{ font--accent.family }}, {{ font--accent.fallback_families }};
+  --font--accent--weight: {{ font--accent.weight | default: 400 }};
+  --font--accent--style: {{ font--accent.style }};
+
+  --font--paragraph--family: {{ font--paragraph.family }}, {{ font--paragraph.fallback_families }};
+  --font--paragraph--weight: {{ font--paragraph.weight | default: 400 }};
+  --font--paragraph--style: {{ font--paragraph.style }};
+  --font--bolder-paragraph--weight: {{ font--paragraph--bold.weight | default: 700 }};
+
+  --image--loading-animation: url('{{ "AjaxLoader.gif" | asset_url }}');
+  --image--grabbing-icon: url('{{ "grabbing.png" | asset_url }}');
+
+{% endcapture %}

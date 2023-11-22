@@ -1,0 +1,66 @@
+<ul class="fw--breadcrumbs fw--blocks list spacing--2y font--paragraph">
+   <li class="font--block-link"><a href="/">{{ 'general.breadcrumbs.home' | t }}</a></li>
+   {% if template contains "product" %}
+      {% if collection %}            
+         <li class="font--block-link"><a href="/collections">{{ 'general.breadcrumbs.collections' | t }}</a></li>
+         <li class="font--block-link"><a href="{{ collection.url }}">{{ collection.title }}</a></li>
+      {% else %}
+         <li class="font--block-link"><a href="/collections/all">{{ 'general.breadcrumbs.products' | t }}</a></li>
+      {% endif %}
+      
+      <li class="font--accent">{{ product.title }}</li>
+
+   {% elsif template contains "collection" %}
+     {% assign collection_title = collection.title %}
+     {% if collection.handle == 'all' %}
+        {% assign collection_title = 'general.breadcrumbs.products' | t %}
+     {% endif %}
+
+      <li class="font--block-link"><a href="/collections">{{ 'general.breadcrumbs.collections' | t }}</a></li>
+      <li class="font--accent">
+         {% if current_tags %}
+            {{ collection_title | link_to_remove_tag: current_tags.first }}
+         {% else %}
+            {{ collection_title }}
+         {% endif %}
+      </li>
+      {% if current_tags %}
+         <li class="font--accent">{{ current_tags.first }}</li>
+      {% endif %}
+
+   {% elsif template contains "blog" %}
+      <li class="font--accent">{{ blog.title }}</li>
+   {% elsif template contains "page" %}
+      <li class="font--accent">{{ page.title }}</li>
+   {% elsif template contains "article" %}
+      <li class="font--block-link">{{ blog.title | link_to: blog.url }}</li>
+      <li class="font--accent">{{ article.title }}</li>
+   {% elsif template contains "404" %}
+      <li class="font--accent">404</li>
+   {% elsif template contains "customers/login" %}
+      <li class="font--accent">{{ 'general.breadcrumbs.account' | t }}</li>
+   {% elsif template contains "customers/register" %}
+      <li class="font--accent">{{ 'general.breadcrumbs.register' | t }}</li>
+   
+   {% elsif template contains "customers/account" %}
+      <li class="font--accent">{{ 'general.breadcrumbs.account' | t }}</li>
+   {% elsif template contains "customers/addresses" %}
+      <li class="font--block-link"><a href="/account">{{ 'general.breadcrumbs.account' | t }}</a></li>
+      <li class="font--accent">{{ 'general.breadcrumbs.addresses' | t }}</li>
+   {% elsif template contains "customers/order" %}
+      <li class="font--block-link"><a href="/account">{{ 'general.breadcrumbs.account' | t }}</a></li>
+      <li class="font--accent">{{ page_title }}</li>
+   {% elsif template contains "customers/activate_account" %}
+      <li class="font--accent">{{ 'general.breadcrumbs.activate_account' | t }}</li>
+
+
+   {% elsif template contains "customers/reset_password" %}
+      <li class="font--accent">{{ page_title }}</li>
+   {% elsif template contains "search" %}
+      <li class="font--accent">{{ page_title }}</li>
+   {% elsif template contains "list-collections" %}
+      <li class="font--accent">{{ page_title }}</li>
+   {% elsif template contains "cart" %}
+      <li class="font--accent">{{ page_title }}</li>
+   {% endif %}      
+</ul>

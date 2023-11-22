@@ -1,0 +1,135 @@
+{% assign facebook_url = settings.social--facebook--url %}
+{% assign twitter_url = settings.social--twitter--url %}
+{% assign google_plus_url = settings.social--google-plus--url %}
+{% assign pinterest_url = settings.social--pinterest--url %}
+{% assign instagram_url = settings.social--instagram--url %}
+{% assign vimeo_url = settings.social--vimeo--url %}
+{% assign youtube_url = settings.social--youtube--url %}
+{% assign tumblr_url = settings.social--tumblr--url %}
+
+{% if facebook_url.size > 0 or twitter_url.size > 0 or google_plus_url.size > 0 or pinterest_url.size > 0 or instagram_url.size > 0 or vimeo_url.size > 0 or youtube_url.size > 0 or tumblr_url.size > 0 %}
+  {% assign show-social = true  %}
+{% endif %}
+
+<div class="contact-modal">
+
+  {% if section.settings.contact--type == 'modal' and view == 'mobile-nav' %}
+    <span class="mobile-nav--contact-modal-trigger">
+      <a class="contact-modal--button font--secondary-button" href="#">
+        {{ section.settings.contact--text | escape }}
+      </a>
+    </span>
+  {% elsif section.settings.contact--type == 'link' %}
+    <a class="contact-modal--button font--secondary-button" href="{{ section.settings.contact--url }}">
+      {{ section.settings.contact--text | escape }}
+    </a>
+  {% elsif section.settings.contact--type == 'modal' %}
+
+    <div
+      class="modal"
+      data-js-class="FrameworkModal"
+      data-modal--fullscreen="true"
+      data-modal--view="contact-modal"
+    >
+      <div class="modal--link">
+        <a class="contact-modal--button font--secondary-button" href="{{ store.url}}/pages/contact">
+          {{ section.settings.contact--text | escape }}
+        </a>
+      </div>
+
+      <div class="modal--content">
+        <div class="contact-modal--content">
+          <div class="contact-modal--wrapper">
+            <div class="contact-modal--header">
+              {% if settings.contact-modal--alternative-text and section.settings.inverted-logo %}
+                {% include 'framework--logo', image_type: 'inverted' %}
+              {% else %}
+                {% include 'framework--logo' %}
+              {% endif %}
+            </div>
+
+            {% unless section.settings.store--address == blank and section.settings.store--hours == blank %}
+              <div class="contact-modal--left-column">
+                {% unless section.settings.store--address == blank %}
+                  <div class="contact-modal--address">
+                    <div class="contact-modal--address-text font--paragraph">
+                      {{ section.settings.store--address | newline_to_br }}
+                    </div>
+                    {% assign block_link_class = "font--block-link" %}
+                    {% if settings.contact-modal--alternative-text %}
+                      {% assign block_link_class = "font--block-link--inverted" %}
+                    {% endif %}
+
+                    <div class="contact-modal--address-link {{ block_link_class }}">
+                      <a
+                        href="https://www.google.ca/maps/place/{{ section.settings.store--address | url_encode }}"
+                        target="_blank"
+                        rel="nofollow"
+                      >
+                        {{ 'home.map.open_in_maps' | t }}
+                      </a>
+                    </div>
+                  </div>
+                {% endunless %}
+
+                {% unless section.settings.store--hours == blank %}
+                  <div class="contact-modal--hours">
+                    <div class="contact-modal--hours-text font--paragraph">{{ section.settings.store--hours }}</div>
+                  </div>
+                {% endunless %}
+              </div>
+            {% endunless %}
+
+            <div class="contact-modal--right-column">
+              <div class="contact-modal--form">
+
+                <div class="contact-modal--form-error"></div>
+
+                <h3 class="contact-modal--form-title font--block-heading">
+                  {{ 'layout.header.contact-us' | t }}
+                </h3>
+
+                {% form 'contact', id: 'contact_form_modal' %}
+
+                  <p>
+                    <input type="text" name="contact[name]" class="styled-input{% if form.errors contains 'name' %} error{% endif %}" value="{{ contact.fields.name }}" aria-label="{{ 'contact_page.name' | t }}" placeholder="{{ 'contact_page.name' | t }}" />
+                  </p>
+                  <p>
+                    <input required="required" type="email" name="contact[email]" class="styled-input{% if form.errors contains 'email' %} error{% endif %}" value="{{ contact.fields.email }}" aria-label="{{ 'contact_page.email' | t }}" placeholder="{{ 'contact_page.email' | t }}"/>
+                  </p>
+                  <p>
+                    <textarea required="required" rows="10" cols="60" name="contact[body]" class="styled-input{% if form.errors contains 'body' %} error{% endif %}" aria-label="{{ 'contact_page.message' | t }}" placeholder="{{ 'contact_page.message' | t }}">{{  contact.fields.body }}</textarea>
+                  </p>
+                  <p>
+
+                  {% if settings.contact-modal--alternative-text %}
+                    <input class="font--secondary-button--inverted" type="submit" value="{{ 'contact_page.button' | t }}" />
+                  {% else %}
+                    <input class="font--button" type="submit" value="{{ 'contact_page.button' | t }}" />
+                  {% endif %}
+                  </p>
+
+                  {% if form.posted_successfully? or form.errors %}
+                    <script>
+                      window.location.hash = '#feedback-bar--contact-modal';
+                    </script>
+                  {% endif %}
+
+                {% endform %}
+
+              </div>
+
+              {% if show-social %}
+                <div class="contact-modal--social">
+                  <h3 class="contact-modal--social-title">{{ 'layout.header.follow' | t }}</h3>
+                  {% include 'partial--social-media' with 'modal' %}
+                </div>
+              {% endif %}
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  {% endif %}
+</div>

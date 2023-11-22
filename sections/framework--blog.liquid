@@ -1,0 +1,452 @@
+{% comment %} Translations {% endcomment %}
+{% assign all_t = 'blog.all' | t %}
+{% assign placeholder_title_t = 'blog.placeholder_title' | t %}
+{% assign placeholder_timesince_t = 'blog.placeholder_timesince' | t %}
+{% assign placeholder_excerpt_t = 'blog.placeholder_excerpt' | t %}
+{% assign no_articles_t = 'blog.no_articles' | t %}
+{% assign filter_t = 'blog.filter' | t %}
+{% assign rss_t = 'blog.rss' | t %}
+{% assign read_more_t = 'blog.article.read_more' | t %}
+{% assign featured_t = 'blog.article.featured' | t %}
+
+{% comment %} Variables {% endcomment %}
+{% assign blog_unfiltered = blogs[blog.handle] %}
+
+{% assign show_featured = section.settings.show-featured %}
+{% assign show_tags = section.settings.show-tag-filter %}
+{% assign show_title = section.settings.show-title %}
+{% assign image_height = section.settings.image-height %}
+{% assign apply_overlay = section.settings.apply-overlay %}
+{% assign show_excerpt = section.settings.show-excerpt %}
+{% assign show_rss = section.settings.show-rss %}
+
+{% assign alternative_color = section.settings.alt-color %}
+{% assign num_columns = section.settings.columns %}
+{% assign featured_tag = section.settings.tag | downcase | escape %}
+
+{% capture arrow_right %}
+	{% include 'snippet-symbol' with 'arrow-right' %}
+{% endcapture %}
+
+{% capture arrow_left %}
+	{% include 'snippet-symbol' with 'arrow-left' %}
+{% endcapture %}
+
+{% capture get_featured_article %}
+	{% assign featured_article = '' %}
+	{% assign break_loop = false %}
+	{% for article in blog_unfiltered.articles %}
+
+		{% for article_tag in article.tags %}
+			{% assign filtered_tag = article_tag | downcase | escape %}
+
+			{% if filtered_tag == featured_tag %}
+
+				{% assign featured_article = article %}
+				{% assign break_loop = true %}
+				{% break %}
+
+			{% endif %}
+		{% endfor %}
+
+		{% comment %} this logic exits loop so that
+		only one featured article is displayed {% endcomment %}
+		{% if break_loop %}
+			{% break %}
+		{% endif %}
+
+	{% endfor %}
+{% endcapture %}
+
+{% paginate blog.articles by 36 %}
+
+{% comment %} View {% endcomment %}
+<div
+  class="blog--root"
+	data-section-id="{{ section.id }}"
+	data-js-class="Blog"
+	data-columns="{{ num_columns }}"
+	data-articles="{{ blog.articles.size }}"
+	data-apply-overlay="{{ apply_overlay }}"
+	data-alt-color="{{ alternative_color }}"
+	data-show-featured="{{ show_featured }}"
+	data-image-height="{{ image_height }}"
+	data-show-tags="{{ show_tags }}"
+	data-show-title="{{ show_title }}"
+>
+
+	{% if show_featured and blog.articles.size > 0 %}
+		<div class="blog--featured">
+      <div class="blog--featured-container">
+
+        {% assign featured_article_exists = false %}
+        {% for tag in blog.all_tags %}
+
+          {% assign filtered_tag = tag | downcase | escape %}
+
+          {% if filtered_tag == featured_tag %}
+            {% assign featured_article_exists = true %}
+            {{ get_featured_article }}
+
+            <div class="blog--featured-header">
+              <h2 class="font--featured-heading">
+                <a href="{{ featured_article.url }}">{{ featured_article.title }}</a>
+              </h2>
+            </div>
+
+            <a href="{{ featured_article.url }}">
+              <div class="blog--featured-image">
+                {% if featured_article.image %}
+                  {%
+                    include "framework--image",
+                    image: featured_article.image,
+                    full_width: true
+                  %}
+                {% else %}
+                  {%
+                    include "framework--placeholder",
+                    type: "lifestyle",
+                    placeholder_index: 2
+                  %}
+                {% endif %}
+              </div>
+            </a>
+
+            <h3 class="blog--featured-title--mobile">
+              <a href="{{ featured_article.url }}">{{ featured_article.title }}</a>
+            </h3>
+
+            <div class="blog--featured-timesince font--light-accent">
+              <span class="blog--featured-text">{{ featured_t }} &CenterDot;</span>
+              {%
+                include "framework--utils",
+                utility: "timesince",
+                created_at: featured_article.published_at
+              %}
+            </div>
+
+            {% if show_excerpt %}
+              <div class="blog--featured-excerpt font--paragraph">
+                {% if featured_article.excerpt == blank %}
+                  {{ featured_article.content | strip_html | truncate: 100 }}
+                {% else %}
+                  {{ featured_article.excerpt }}
+                {% endif %}
+              </div>
+            {% endif %}
+
+            <div class="blog--featured-readmore font--block-link">
+              <a href="{{ featured_article.url }}">{{ read_more_t }}</a>
+            </div>
+          {% endif %}
+        {% endfor %}
+
+        {% if featured_article_exists == false %}
+          <div class="blog--featured-header" >
+            <h2><a href="#" class="font--featured-heading">{{ placeholder_title_t }}</a></h2>
+          </div>
+
+          <div class="blog--featured-image">
+            {%
+              include "framework--placeholder",
+              type: "lifestyle",
+              aspect_ratio: 1.45,
+              placeholder_index: 2
+            %}
+          </div>
+
+          <h3 class="blog--featured-title--mobile">{{ placeholder_title_t }}</h3>
+
+          <div class="blog--featured-timesince font--light-accent">
+            {{ placeholder_timesince_t }}
+          </div>
+
+          {% if show_excerpt %}
+            <div class="blog--featured-excerpt font--paragraph">
+              {{ placeholder_excerpt_t }}
+            </div>
+          {% endif %}
+
+          <div class="blog--featured-readmore font--block-link">
+            <a href="#">{{ read_more_t }}</a>
+          </div>
+        {% endif %}
+      </div>
+		</div>
+	{% endif %}
+
+	{% if show_title or blog.all_tags.size > 0 and show_tags %}
+    <div class="blog--header--root">
+      <div class="blog--header">
+        {% if show_title %}
+          <h1 class="blog--title"><a href="/blogs/{{ blog.handle}}">{{ blog.title }}</a></h1>
+        {% endif %}
+
+        {% if blog.all_tags.size > 0 and show_tags %}
+          <div class="blog--filter--root">
+            <div class="blog--filter--header">
+              <h3 class="font--accent">{{ filter_t }}</h3>
+            </div>
+
+            <nav class="blog--filter--body" id="blog-filters">
+              <ul class="blog--filter--menu font--accent">
+                <li
+                  class="blog--filter--menu-item {% if current_tags == blank %}font--block-link{% endif %}"
+                  data-selected="{% if current_tags == blank %}true{% endif %}"
+                >
+                  <a href="/blogs/{{ blog.handle}}#blog-filters">{{ all_t }}</a>
+                </li>
+
+                {% for tag in blog.all_tags %}
+                  {% assign hidden_tags = section.settings.hide-tags | split: ',' %}
+                  {% assign temp_tag = tag | downcase | escape %}
+                  {% assign skip = false %}
+
+                  {% for hidden_tag in hidden_tags %}
+                    {% assign formatted_hidden_tag = hidden_tag | downcase | escape | strip %}
+                    {% if temp_tag == formatted_hidden_tag %}
+                      {% assign skip = true %}
+                    {% endif %}
+                  {% endfor %}
+
+                  {% if skip %}
+                    {% continue %}
+                  {% endif %}
+
+                  <li
+                    class="blog--filter--menu-item {% if current_tags contains tag %}font--block-link{% endif %}"
+                    data-selected="{% if current_tags contains tag %}true{% endif %}"
+                  >
+                    <a href="/blogs/{{ blog.handle }}/tagged/{{ tag | handleize }}#blog-filters">
+                      {{ tag }}
+                    </a>
+                  </li>
+                {% endfor %}
+              </ul>
+
+              <select id="filter" class="blog--filter--select" onChange="window.location.href=this.value">
+
+                <option class="blog--filter--select-item"
+                  {% if current_tags == blank %} selected="selected" {% endif %}
+                  value="/blogs/{{ blog.handle }}#filter">
+                  {{ all_t | capitalize }}
+                </option>
+
+                {% for tag in blog.all_tags %}
+                  {% assign hidden_tags = section.settings.hide-tags | split: ',' %}
+                  {% assign temp_tag = tag | downcase | escape %}
+                  {% assign skip = false %}
+
+                  {% for hidden_tag in hidden_tags %}
+                    {% assign formatted_hidden_tag = hidden_tag | downcase | escape | strip %}
+                    {% if temp_tag == formatted_hidden_tag %}
+                      {% assign skip = true %}
+                    {% endif %}
+                  {% endfor %}
+
+                  {% if skip %}
+                    {% continue %}
+                  {% endif %}
+
+                  <option class="blog--filter--select-item"
+                    {% if current_tags contains tag %} selected="selected" {% endif %}
+                    value="/blogs/{{ blog.handle }}/tagged/{{ tag | handleize }}#filter">
+                    {{ tag | capitalize }}
+                  </option>
+                {% endfor %}
+
+              </select>
+            </nav>
+
+          </div>
+        {% endif %}
+      </div>
+
+    </div>
+
+	{% endif %}
+
+	{% if blog.articles.size > 0 %}
+
+    <div class="blog--body">
+      <div class="blog--list">
+        {% for article in blog.articles %}
+
+          {% comment %} don't display the featured article in the blog list {% endcomment %}
+          {% if featured_article.title == article.title and show_featured == true %}
+            {% continue %}
+          {% endif %}
+
+          {% comment %} View {% endcomment %}
+          <div
+            class="blog--list--item"
+            {{ block.shopify_attributes }}
+          >
+            {% if article.image %}
+              <a class="blog--list--image-link" href="{{ article.url }}">
+                <div class="blog--list--item-image">
+                  {%
+                    include "framework--image",
+                    image: article.image,
+                    full_width: true
+                  %}
+                </div>
+              </a>
+            {% endif %}
+
+            <h3 class="blog--list--item-title">
+              <a href="{{ article.url }}">
+                {{ article.title }}
+              </a>
+            </h3>
+
+            <div class="blog--list--item-timesince font--light-accent">
+              {%
+                include "framework--utils",
+                utility: "timesince",
+                created_at: article.published_at
+              %}
+            </div>
+
+            {% if show_excerpt %}
+              <div class="blog--list--item-excerpt font--paragraph">
+                {% if article.excerpt == blank %}
+                  {{ article.content | strip_html | truncate: 100 }}
+                {% else %}
+                  {{ article.excerpt }}
+                {% endif %}
+              </div>
+            {% endif %}
+
+            <div class="blog--list--item-readmore font--block-link">
+              <a href="{{ article.url }}">{{ read_more_t }}</a>
+            </div>
+
+          </div>
+        {% endfor %}
+
+      </div>
+
+      {% if paginate.pages > 1 or show_rss %}
+
+        <div class="blog--footer">
+          {% if show_rss %}
+            <div class="blog--footer-rss">
+              <a href="{{ shop.url }}{{ blog.url }}.atom">
+                {{ rss_t }}
+              </a>
+            </div>
+          {% endif %}
+
+          {% if paginate.pages > 1 %}
+            <div class="blog--footer-pagination">
+              {{ paginate | default_pagination: next: arrow_right, previous: arrow_left }}
+            </div>
+          {% endif %}
+        </div>
+
+      {% endif %}
+
+    </div>
+
+	{% else %}
+
+		<div class="blog--no-articles">
+			<p class="font--paragraph">{{ no_articles_t }}</p>
+		</div>
+
+	{% endif %}
+
+</div>
+
+{% endpaginate %}
+
+{% schema %}
+  {
+    "name": "Blog",
+    "settings": [
+      {
+        "id": "show-title",
+        "label": "Show blog title",
+        "type": "checkbox",
+        "default": true
+      },
+      {
+        "id": "show-tag-filter",
+        "label": "Show tag filter",
+        "type": "checkbox",
+        "default": true
+      },
+      {
+        "id": "hide-tags",
+        "label": "Hide tags from tag filter",
+        "type": "text",
+        "default": "featured, pinned",
+        "placeholder": "featured, pinned",
+        "info": "Use a comma to separate"
+      },
+      {
+        "id": "show-excerpt",
+        "label": "Show excerpt",
+        "type": "checkbox",
+        "default": true
+      },
+      {
+        "id": "show-rss",
+        "label": "Show RSS",
+        "type": "checkbox",
+        "default": true
+      },
+      {
+        "id": "columns",
+        "label": "Columns",
+        "type": "range",
+        "min": 1,
+        "max": 3,
+        "step": 1,
+        "default": 2
+      },
+      {
+        "type": "header",
+        "content": "Featured article"
+      },
+      {
+        "id": "show-featured",
+        "label": "Show",
+        "type": "checkbox",
+        "default": true
+      },
+      {
+        "id": "tag",
+        "label": "Tag",
+        "type": "text",
+        "default": "featured",
+        "info": "Tag a blog post with \"featured\" or change this to match an existing tag"
+      },
+			{
+        "id": "image-height",
+        "label": "Height",
+        "type": "select",
+        "options": [
+          { "value": "small", "label": "Small" },
+          { "value": "medium", "label": "Medium" },
+          { "value": "large", "label": "Large (natural height)" }
+        ],
+        "default": "medium"
+      },
+      {
+        "id": "alt-color",
+        "label": "Use alternative text color",
+        "type": "checkbox",
+        "default": true
+      },
+      {
+        "id": "apply-overlay",
+        "label": "Darken image",
+        "type": "checkbox",
+        "default": true,
+        "info": "Can enhance text visibility"
+      }
+    ]
+  }
+{% endschema %}

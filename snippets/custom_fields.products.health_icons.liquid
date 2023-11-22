@@ -1,0 +1,15 @@
+{% if product.metafields.custom_fields["health_icons"] != blank %}
+  <div class="custom-field custom-field__health-icons custom-field__type--image-repeater">
+    <h3 class="custom-field--title">Health Icons</h3>
+    <div class="custom-field--value">
+      {% for item in product.metafields.custom_fields["health_icons"] %}
+        <div class="fc-repeater-field-item fc-repeater-field-item--{{ forloop.index0 }} field__health-icons field-type--image">
+           <h4 class="custom-field--title">Health Icons</h4>
+           <div class="custom-field--value">
+             {{ item["health_icons"] }}
+           </div>
+        </div>
+       {% endfor %}
+    </div>
+  </div>
+{% endif %}

@@ -1,0 +1,353 @@
+{% capture product_meta %}
+  <meta itemprop="url" content="{{ shop.url }}{{ product.url }}" />
+  <meta itemprop="name" content="{{ product.title }}" />
+  <meta itemprop="image" content="https:{{ product.featured_image.src | product_img_url: '600x600' }}" />
+{% endcapture %}
+
+{% assign description = product.description  %}
+
+{% assign paragraph_count = product.description | split: '<p>' %}
+{% assign show_excerpt = false %}
+{% if description.size > 400 or paragraph_count.size > 3 %}
+  {% assign show_excerpt = true %}
+  {% assign product_excerpt = product.metafields.global.description_tag %}
+  {% if product_excerpt == blank %}
+	{% assign product_excerpt = product.description | strip_html | truncate: 65 %} 
+  {% endif %}
+{% endif %}
+
+{% capture variants %}
+  <select data-spark="b2c-only" name="id" id="product-page--select">
+    {% for variant in product.variants %}
+      <option
+        data-sku="{{ variant.sku }}"
+        {% if variant.inventory_quantity <= 0 and variant.available == false %}DISABLED {% endif %}
+        {% if variant == product.selected_or_first_available_variant %}selected="selected" {% endif %}
+        value="{{ variant.id }}"
+      >
+        {{ variant.title }} - {{ variant.price | money }}
+      </option>
+    {% endfor %}
+  </select>
+{% endcapture %}
+
+{% capture price_meta %}
+  <meta itemprop="priceCurrency" content="{{ shop.currency }}" />
+  {% if product.available %}
+    <link itemprop="availability" href="http://schema.org/InStock" />
+  {% else %}
+    <link itemprop="availability" href="http://schema.org/OutOfStock" />
+  {% endif %}
+  {% assign price_meta = product.selected_or_first_available_variant.price | divided_by: 100.00 %}
+  <meta itemprop="price" content="{{ price_meta }}">
+{% endcapture %}
+
+{% capture thumbnail_images %}
+  {% for image in product.images %}
+
+    {% assign active = false %}
+    {% if image.id == product.featured_image.id %}
+      {% assign active = true %}
+    {% endif %}
+
+    <div class="product-page--thumb" tabindex="0" data-image-id="{{ image.id }}" data-active="{{ active }}">
+      {%
+        include 'framework--image',
+        image: image,
+        widths: '90, 180'
+      %}
+    </div>
+  {% endfor %}
+{% endcapture %}
+
+{% capture product_images %}
+  {% for image in product.images %}
+    {% if section.settings.modal--enable %}
+      <a href="#" class="modal--link">
+    {% endif %}
+
+      {% assign active = false %}
+      {% if image.id == product.featured_image.id %}
+        {% assign active = true %}
+      {% endif %}
+
+      <div class="product-page--image" data-image-id="{{ image.id }}" data-active="{{ active }}">
+        {% include 'framework--image', image: image, max_height: 600 %}
+      </div>
+
+    {% if section.settings.modal--enable %}
+      </a>
+    {% endif %}
+  {% endfor %}
+{% endcapture %}
+
+{% comment %} View {% endcomment %}
+<div
+  class="product-page--root"
+  data-js-class="ProductPage"
+  data-section-id="{{ section.id }}"
+  data-section-type="product_page"
+  data-modal-enabled="{{ section.settings.modal--enable }}"
+  data-show-thumbs-bottom="{% if product.images.size > 4 %}true{% else %}false{% endif %}"
+  data-product-page--show-variants="{% if product.variants.size > 1 %}true{% else %}false{% endif %}"
+>
+  <div class="product-page--main" itemscope itemtype="http://schema.org/Product">
+    {{ product_meta }}
+    <div class="product-page--main-container">
+      <div class="product-page--info-box">
+        <div class="product-page--info-box--container">
+          <div
+            class="product-page--close-description"
+            aria-label="{{ 'products.details_panel.close' | t }}"
+          >
+            {% include 'snippet-symbol' with 'cross' %}
+          </div>
+
+          <h2 class="product-page--title font--section-heading">{{ product.title }}</h2>
+          {% if section.settings.vendor-name--show %}
+            <div class="product-page--vendor font--accent">
+              <a href="{{ product.vendor | url_for_vendor }}">{{ product.vendor }}</a>
+            </div>
+          {% endif %}
+
+          <div class="product-page--slider">
+            <div
+              class="fw--slider"
+              data-js-class="FrameworkSlider"
+              data-navigation="true"
+              data-pagination="false"
+              data-pagination-numbers="false"
+            >
+              {% for image in product.images %}
+                <div class="product-page--slider-image" data-image-id="{{ image.id }}">
+                  {%
+                    include "framework--image",
+                    image: image
+                  %}
+                </div>
+              {% endfor %}
+            </div>
+          </div>
+
+          {% unless product.description == blank %}
+            <div class="product-page--excerpt font--paragraph">
+              
+              {% if show_excerpt %}
+                {{ product_excerpt }}
+              {% else %}
+                {{ product.description }}
+              {% endif %}
+            </div>
+          {% endunless %}
+
+          {% if show_excerpt %}
+            <div
+              class="product-page--description-toggle"
+              aria-label="{{ 'products.details_panel.toggle' | t }}">
+              <div class="product-page--more-details font--block-link">
+                <a role="button" tabindex="0">
+                  {{ 'products.details_panel.more' | t }}
+                </a>
+              </div>
+
+              <div class="product-page--less-details font--block-link">
+                <a role="button" tabindex="0">
+                  {{ 'products.details_panel.less' | t }}
+                </a>
+              </div>
+            </div>
+          {% endif %}
+
+          {%- if customer.metafields.sparklayer.authentication -%}
+            <div style="padding: 0 16px;">
+
+              
+          <spark-pdp parent-id="{{ product.id }}"></spark-pdp>
+
+            </div>
+{%- endif -%}
+
+          
+          <div data-spark="b2c-only" class="product-page--cart-form">
+            {% form 'product', product %}
+              <input type="hidden" name="quantity" value="1">
+
+                <div class="product-page--variants">
+                  {{ variants }}
+
+                  {% comment %} <!-- Using select-wrapper class to inherit styles -->
+                  <div class="selector-wrapper">
+                    <label for="quantity">Quantity</label>
+                    <input id="quantity" type="number" name="quantity" min="1" value="1" style="width: 60px" />
+                  </div>
+                  {% endcomment %}
+
+                </div>
+				            	
+              <div class="product-page--price-n-button-wrapper">
+
+                {% if product.price > 0 %}
+                  <div
+                    class="product-page--price-wrapper"
+                    itemprop="offers"
+                    itemscope
+                    itemtype="http://schema.org/Offer"
+                  >
+                    {{ price_meta }}
+
+                    <div class="product-page--compare-price font--light-accent">
+                      {% if product.compare_at_price > product.price %}
+                        {{ product.compare_at_price | money }}
+                      {% endif %}                
+                    </div>
+                    
+                    <div class="product-page--price font--accent">{{ product.price | money }}</div>
+                  </div>
+                {% endif %}
+
+                {% render 'bsub-widget' %}
+
+                
+                <div class="product-page--sold-out">
+                  <div class="product-page--sold-out--variant">
+                    {{ 'products.sold_out.variant' | t }}
+                  </div>
+                  <div class="product-page--unavailable-variant">
+                    {{ 'products.unavailable_variant' | t }}
+                  </div>
+                  {% if product.available == false %}
+                    <div class="product-page--sold-out--product">
+                      {{ 'products.sold_out.product' | t }}
+                    </div>
+                  {% endif %}
+                </div>
+
+                {% assign cart_button_class = 'font--button' %}
+                {% if section.settings.smart_payment_button %}
+                  {% assign cart_button_class = 'font--secondary-button' %}
+                {% endif %}            
+                
+				<!-- Remove comment to get back AddToCart button -->
+                <button class="product-page--add-to-cart {{ cart_button_class }}" type="submit" name="add">
+                  <span class="text">{{ 'products.add_to_cart' | t }}</span>
+                  <span class="fw--loading_animation tiny" data-js-class="FrameworkLoadingAnimation">
+                  </span>
+                </button>
+                
+
+              </div>
+				
+            	<!-- Remove comment to get back Buy with PayPal button -->
+              {% if section.settings.smart_payment_button %}
+                <div class="product-page--smart-payment-buttons">
+                  {{ form | payment_button }}
+                </div>    
+              {% endif %}
+            	
+            {% endform %}
+          </div>
+
+          <div class="product-page--description font--paragraph rte-content">
+            {{ product.description }}
+          </div>
+
+          {% if section.settings.share %}
+            <div class="product-page--social-media">
+              {% include 'partial--social-media' with 'product' %}
+            </div>
+          {% endif %}
+
+        </div>
+      </div> <!-- .product-page--info-box-wrapper -->
+
+      {% if product.images.size > 0 %}
+        <div class="product-page--images">
+
+          <div class="modal" data-js-class="FrameworkModal">
+            <div class="product-page--image-container">
+              {{ product_images }}
+            </div>
+            <div class="product-page--modal-images">
+              {% for image in product.images %}
+                <div class="modal--content">
+                  {%
+                    include "framework--image",
+                    image: image
+                  %}
+                </div>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+
+        {% if product.images.size > 1 %}
+          <div class="product-page--thumbs">
+            {{ thumbnail_images }}
+          </div>
+        {% endif %}
+      {% endif %}
+    </div>
+  </div> <!-- .product-page--main -->
+
+  {% if product.images.size > 1 %}
+    <div class="product-page--thumbs--mq-medium">
+      {{ thumbnail_images }}
+    </div>
+  {% endif %}
+
+</div>
+
+<script>
+  theme.product = {};
+  theme.product.id = {{ product.id }};
+  theme.product_json = {{ product | json }};
+
+  var selectCallback = function(variant, selector) {
+    theme.partials.ProductPage.variantSelected(variant, selector);
+    // add your selectCallback code here...
+
+  };
+
+  jQuery(function($) {
+    new Shopify.OptionSelectors('product-page--select', {
+      product: theme.product_json,
+      onVariantSelected: selectCallback,
+      enableHistoryState: true
+    });
+  });
+
+</script>
+
+{% schema %}
+{
+  "name": "Product page",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "smart_payment_button",
+      "label": "Show dynamic checkout button",
+      "info": "Lets customers check out directly using a familiar payment method. [Learn more](https://help.shopify.com/manual/using-themes/change-the-layout/dynamic-checkout)",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "modal--enable",
+      "label": "Enable image zoom",
+      "default": true,
+      "info": "Opens when clicking featured product image"
+    },
+    {
+      "type": "checkbox",
+      "id": "vendor-name--show",
+      "label": "Show vendor name",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "share",
+      "label": "Enable social sharing",
+      "default": true
+    }
+  ]
+}
+{% endschema %}

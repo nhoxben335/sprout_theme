@@ -1,0 +1,189 @@
+<header
+  class="header"
+  data-js-class="Header"
+  data-section-id="{{ section.id }}"
+  data-section-type="header"
+>
+  <div class="header--y-menu-for-off-canvas">
+    {% include 'framework--y-menu', handle: section.settings.menu %}
+  </div>
+
+  {% if section.settings.contact--enabled %}
+    <div class="header--contact-button-for-off-canvas show-after-js">
+      {% include 'partial--contact-modal', view: 'mobile-nav' %}
+    </div>
+  {% endif %}
+
+  <div class="header--container show-after-js">
+    <div class="header--left-side font--accent">
+      <div class="header--main-menu">
+        {%
+          include 'framework--x-menu',
+          overlap_parent: 2,
+          js_class: 'XMenu',
+          handle: section.settings.menu
+        %}
+      </div>
+    </div>
+    <div class="header--center">
+      <div class="header--logo">
+        {% include 'framework--logo' %}
+      </div>
+    </div>
+    <div class="header--right-side">
+      {% if shop.customer_accounts_enabled %}
+        <div class="header--account font--accent">
+          {% include 'layout--login' %}
+        </div>
+      {% endif %}
+
+      {% if settings.search--show-in-header %}
+        <a class="header--search" href="/search">
+          {% include 'snippet-symbol' with 'search' %}
+        </a>
+      {% endif %}
+
+      {% if section.settings.contact--enabled and section.settings.contact--text != blank %}
+        <div class="header--contact-modal">
+          {% include 'partial--contact-modal' %}
+        </div>
+      {% endif %}
+		
+   
+      <div class="header--cart font--button">
+        {% include 'partial--cart' %}
+
+      </div>
+
+    </div>
+  </div>
+
+  <noscript>
+    <div class="header--container" data-no-script="true">
+      <div class="header--left-side font--accent">
+        <div class="header--main-menu">
+          {%
+            include 'framework--x-menu',
+            overlap_parent: 2,
+            js_class: 'XMenu',
+            handle: section.settings.menu
+          %}
+        </div>
+      </div>
+      <div class="header--center">
+        <div class="header--logo">
+          {% include 'framework--logo' %}
+        </div>
+      </div>
+      <div class="header--right-side">
+
+        {% if shop.customer_accounts_enabled %}
+          <div class="header--account font--accent">
+            {% include 'layout--login' %}
+          </div>
+        {% endif %}
+
+        {% if section.settings.enable-search %}
+          <div class="header--search">
+             {% include 'framework--search', view: 'modal' %}
+          </div>
+        {% endif %}
+
+        {% if section.settings.contact--enabled and section.settings.contact--text != blank %}
+          <div class="header--contact-modal">
+            {% include 'partial--contact-modal' %}
+          </div>
+        {% endif %}
+
+        <div class="header-cart font--accent">
+          <a href="{{ shop.url}}/cart">{{ 'cart.title' | t }}</a>
+        </div>
+      </div>
+    </div>
+  </noscript>
+</header>
+
+<style>
+  .fw--logo img {
+    max-height: {{ section.settings.logo-height-range }}px;
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Header",
+  "settings": [
+    {
+      "type": "link_list",
+      "id": "menu",
+      "label": "Menu",
+      "default": "main-menu"
+    },
+    {
+      "type": "image_picker",
+      "id": "logo",
+      "label": "Logo"
+    },
+    {
+      "type": "image_picker",
+      "id": "inverted-logo",
+      "label": "Inverted logo",
+      "info": "Used in contact modal with dark backgrounds for better visibility."
+    },
+    {
+      "label": "Custom logo height",
+      "id": "logo-height-range",
+      "type": "range",
+      "min": 30,
+      "max": 80,
+      "step": 5,
+      "unit": "px",
+      "default": 40,
+      "info": "This is referring to the natural height and should be half the height of the image you uploaded to ensure it stays sharp on retina screens."
+    },
+    {
+      "type": "header",
+      "content": "Contact button"
+    },
+    {
+      "type": "checkbox",
+      "id": "contact--enabled",
+      "label": "Enable",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "contact--text",
+      "label": "Text",
+      "default": "Contact"
+    },
+    {
+      "type": "radio",
+      "id": "contact--type",
+      "options": [
+        { "value": "modal", "label": "Modal"},
+        { "value": "link", "label": "Link"}
+      ],
+      "label": "Type",
+      "default": "modal"
+    },
+    {
+      "type": "url",
+      "id": "contact--url",
+      "label": "Link to"
+    },
+    {
+      "id": "store--address",
+      "type": "textarea",
+      "label": "Address",
+      "default": "391 Sutter St,\r\nSan Francisco"
+    },
+    {
+      "type": "richtext",
+      "id": "store--hours",
+      "label": "Hours",
+      "default": "<p><strong>Coming Soon</strong></p>"
+    }
+  ]
+}
+{% endschema %}

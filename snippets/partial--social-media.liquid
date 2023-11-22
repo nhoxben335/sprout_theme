@@ -1,0 +1,225 @@
+{% assign position = partial--social-media %}
+
+{% assign facebook_url = settings.social--facebook--url | escape %}
+{% assign twitter_url = settings.social--twitter--url | escape %}
+{% assign google_plus_url = settings.social--google-plus--url | escape %}
+{% assign pinterest_url = settings.social--pinterest--url | escape %}
+{% assign instagram_url = settings.social--instagram--url | escape %}
+{% assign vimeo_url = settings.social--vimeo--url | escape %}
+{% assign youtube_url = settings.social--youtube--url | escape %}
+{% assign tumblr_url = settings.social--tumblr--url | escape %}
+
+<div class="partial--social-media position--{{ position }}">
+
+  {% if position == 'header' or position == 'footer' %}
+
+    <div class="fw--blocks list">
+      {% if facebook_url.size > 0 %}
+        <a class="item" title="Facebook" aria-hidden="true" target="_blank" href="{{ facebook_url }}">
+          {% include 'snippet-symbol' with 'facebook' %}
+        </a>
+      {% endif %}
+
+      {% if instagram_url.size > 0 %}
+        <a class="item" title="Instagram" aria-hidden="true" target="_blank" href="{{ instagram_url }}">
+          {% include 'snippet-symbol' with 'instagram' %}
+        </a>
+      {% endif %}
+
+      {% if twitter_url.size > 0 %}
+        <a class="item" title="Twitter" aria-hidden="true" target="_blank" href="{{ twitter_url }}">
+          {% include 'snippet-symbol' with 'twitter' %}
+        </a>
+      {% endif %}
+
+      {% if vimeo_url.size > 0 %}
+        <a class="item" title="Vimeo" aria-hidden="true" target="_blank" href="{{ vimeo_url }}">
+          {% include 'snippet-symbol' with 'vimeo' %}
+        </a>
+      {% endif %}
+
+      {% if pinterest_url.size > 0  %}
+        <a class="item" title="Pinterest" aria-hidden="true" target="_blank" href="{{ pinterest_url }}">
+          {% include 'snippet-symbol' with 'pinterest' %}
+        </a>
+      {% endif %}
+
+      {% if youtube_url.size > 0 %}
+        <a class="item" title="Youtube" aria-hidden="true" target="_blank" href="{{ youtube_url }}">
+          {% include 'snippet-symbol' with 'youtube' %}
+        </a>
+      {% endif %}
+
+      {% if tumblr_url.size > 0  %}
+        <a class="item" title="Tumblr" aria-hidden="true" target="_blank" href="{{ tumblr_url }}">
+          {% include 'snippet-symbol' with 'tumblr' %}
+        </a>
+      {% endif %}
+
+    </div>
+
+
+  {% elsif position == 'modal' %}
+    <div class="fw--blocks list spacing--3">
+      {% if facebook_url.size > 0 %}
+        <a class="item" title="Facebook" aria-hidden="true" target="_blank" href="{{ facebook_url }}">
+          {% include 'snippet-symbol' with 'facebook' %}
+        </a>
+      {% endif %}
+
+      {% if instagram_url.size > 0 %}
+        <a class="item" title="Instagram" aria-hidden="true" target="_blank" href="{{ instagram_url }}">
+          {% include 'snippet-symbol' with 'instagram' %}
+        </a>
+      {% endif %}
+
+      {% if twitter_url.size > 0 %}
+        <a class="item" title="Twitter" aria-hidden="true" target="_blank" href="{{ twitter_url }}">
+          {% include 'snippet-symbol' with 'twitter' %}
+        </a>
+      {% endif %}
+
+      {% if vimeo_url.size > 0 %}
+        <a class="item" title="Vimeo" aria-hidden="true" target="_blank" href="{{ vimeo_url }}">
+          {% include 'snippet-symbol' with 'vimeo' %}
+        </a>
+      {% endif %}
+
+      {% if pinterest_url.size > 0 %}
+        <a class="item" title="Pinterest" aria-hidden="true" target="_blank" href="{{ pinterest_url }}">
+          {% include 'snippet-symbol' with 'pinterest' %}
+        </a>
+      {% endif %}
+
+      {% if youtube_url.size > 0 %}
+        <a class="item" title="Youtube" aria-hidden="true" target="_blank" href="{{ youtube_url }}">
+          {% include 'snippet-symbol' with 'youtube' %}
+        </a>
+      {% endif %}
+
+      {% if tumblr_url.size > 0 %}
+        <a class="item" title="Tumblr" aria-hidden="true" target="_blank" href="{{ tumblr_url }}">
+          {% include 'snippet-symbol' with 'tumblr' %}
+        </a>
+      {% endif %}
+
+    </div>
+
+  {% elsif position == 'product' %}
+    {% capture shareurl %}{{ shop.url }}{{ product.url }}{% endcapture %}
+
+    <div class="share-buttons-list fw--blocks spacing--3">
+      <div class="social--share-title font--accent">
+        {{ 'general.social.product_title' | t }}
+      </div>
+
+      <div class="social--share-item">
+        <a
+          class="social--share-link"
+          href="//www.facebook.com/sharer.php?u={{ shareurl }}&t={{ product.title }}">
+          {% include 'snippet-symbol' with 'facebook' %}
+        </a>
+      </div>
+
+      <div class="social--share-item">
+        <a
+          class="social--share-link"
+          href="//twitter.com/intent/tweet?text=Check%20out%20this%20{%if template contains "article" or template contains "blog"%}blog%20post{% elsif template contains "product" %}product{%endif%}:+{{ shareurl }}">
+          {% include 'snippet-symbol' with 'twitter' %}
+        </a>
+      </div>
+
+      <div class="social--share-item">
+        <a
+          class="social--share-link"
+          href="//pinterest.com/pin/create/button/?url={{ shareurl }}&media={{ product.featured_image | product_img_url: '1024x1024' }}&description={{ product.title | strip_html | escape | replace: ' ', '%20' }}" count-layout="none">
+          {% include 'snippet-symbol' with 'pinterest' %}
+        </a>
+      </div>
+
+    </div>
+
+  {% elsif position == 'blog' %}
+    {% capture shareurl %}{{ shop.url }}{{ article.url }}{% endcapture %}
+    <div class="share-buttons-list fw--blocks">
+
+      {% if settings.social--share-facebook %}
+        <div class="item">
+          <a class="share--link" href="//www.facebook.com/sharer.php?u={{ shareurl }}&t={{ article.title }}">
+            {% include 'snippet-symbol' with 'facebook' %}
+          </a>
+        </div>
+      {% endif %}
+
+      {% if settings.social--share-twitter %}
+        <div class="item">
+          <a class="share--link" href="//twitter.com/intent/tweet?text=Check%20out%20this%20{%if template contains "article" or template contains "blog"%}blog%20post{% elsif template contains "product" %}product{%endif%}:+{{ shareurl }}">
+            {% include 'snippet-symbol' with 'twitter' %}
+          </a>
+        </div>
+      {% endif %}
+
+      {% if settings.social--share-google %}
+        <div class="item">
+          <a
+            class="share--link" href="//plus.google.com/share?url={{ shareurl }}"
+            onclick="javascript:window.open(this.href,  '', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=600,width=600');return false;">
+            {% include 'snippet-symbol' with 'google-plus' %}
+          </a>
+        </div>
+      {% endif %}
+
+      {% if settings.social--share-pinterest %}
+       {% if article.image %}
+          <div class="item">
+            <a class="share--link pinterest--link" href="http://pinterest.com/pin/create/button/?url={{ shareurl }}&media={{ article.image | img_url: '2000x' }}&description={{ article.title | strip_html | escape | replace: ' ', '%20' }}">
+              {% include 'snippet-symbol' with 'pinterest' %}
+            </a>
+          </div>
+        {% endif %}
+      {% endif %}
+
+      {% if settings.social--share-email %}
+      <div class="item">
+        <a
+          class="share--link"
+          href="mailto:?Subject={{ article.title | url_escape }}&body={{ shop.url | url_escape }}{{ article.url | url_escape }}">
+          {% include 'snippet-symbol' with 'mail' %}
+        </a>
+      </div>
+      {% endif %}
+
+
+      {% comment %}
+
+      {% if settings.social--share-tumblr %}
+        <div class="item">
+          <a class="share--link" href="//www.tumblr.com/share/link?url={{ shareurl | replace: '//', '' }}">
+            {% include 'snippet-symbol' with 'tumblr' %}
+          </a>
+        </div>
+      {% endif %}
+
+      {% if settings.social--share-google %}
+        <div class="item">
+          <a
+            class="share--link" href="//plus.google.com/share?url={{ shareurl }}"
+            onclick="javascript:window.open(this.href,  '', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=600,width=600');return false;">
+            {% include 'snippet-symbol' with 'googleplus' %}
+          </a>
+        </div>
+      {% endif %}
+
+
+      {% if settings.social--share-link %}
+      <div class="item copy-link">
+        <a class="share--link" href="/">
+          {% include 'snippet-symbol' with 'link' %}
+        </a>
+        <textarea rows="3">{{ shop.url }}{{ article.url }}</textarea>
+      {% endif %}
+      </div>{% endcomment %}
+    </div>
+  {% endif %}
+
+</div>

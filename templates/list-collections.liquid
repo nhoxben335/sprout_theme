@@ -1,0 +1,83 @@
+{% assign custom_ordering = false %}
+{% assign collection_list = collections %}
+
+{% if linklists.all-collections.links.size > 0 %}
+  {% assign custom_ordering = true %}
+  {% assign collection_list = linklists.all-collections.links %}
+{% endif %}
+
+{% paginate collections by 12 %}
+
+{% for item in collection_list %}
+  {% if custom_ordering %}
+    {% assign collection = item.object %}
+  {% else %}
+    {% assign collection = item %}
+  {% endif %}
+
+  {% if
+    collection.handle == 'all' or
+    collection.handle == 'all-products' or
+    collection.handle == 'frontpage'
+  %}
+    {% continue %}
+  {% endif %}
+
+  {% comment %} Get number of items with singular/plural noun {% endcomment %}
+  {% assign products_in_collection = collection.products.size %}
+  {% if products_in_collection > 0 %}
+    {% if products_in_collection == 1 %}
+      {% assign number_of_items = 'collections.number_of_items' | t: count: 1 %}
+    {% else %}
+      {% assign number_of_items = 'collections.number_of_items' | t: count: products_in_collection %}
+    {% endif %}
+  {% endif %}
+
+  <div class="collection-listing--collection" data-js-class="CollectionListingPage">
+    <div class="collection-listing--left-column">
+      <h3 class="collection-listing--collection-title font--section-heading" title="{{ number_of_items }}">
+        <a href="{{ collection.url }}">{{ collection.title }}
+          <span class="collection-listing--number-of-items">{{ number_of_items }}</span>
+        </a>
+      </h3>
+      {% if collection.products_count > 6 %}
+        <div class="font--block-link">
+          <a class="collection-listing--view-more" href="{{ collection.url }}">
+            {{ 'collections.view_more' | t }}
+          </a>
+        </div>
+      {% endif %}
+    </div>
+
+    <div class="collection-listing--right-column">
+
+      {% for product in collection.products limit: 6 %}
+{%- comment -%} Wholesale Gorilla: do not delete unless app is uninstalled{%- endcomment -%}
+{%- assign wsgTempProd = product -%}{%- assign wsgExclude = false -%}{%- if forloop.first == true -%}{%- assign wsgActive = false -%}{%- assign wsgActiveCustomer = false -%}
+{%- include 'wsg-status' wsgStatusAction: 'init' | strip -%}{%- endif -%}{%- if wsgActive -%}{%- include 'wsg-status' wsgStatusAction: 'col-item' | strip -%}{%- endif -%}{%- if wsgExclude -%} {%- continue -%} {%- endif -%}
+{%- comment -%} end WSG {%- endcomment -%}
+        <div class="collection-listing--product">
+          {% include 'partial--product', view: 'list' %}
+        </div>
+      {% endfor %}
+	  
+      {% if collection.products_count > 6 %}
+        <div class="collection-listing--view-more--mq-small font--block-link">
+          <a href="{{ collection.url }}">{{ 'collections.view_more' | t }}</a>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+{% endfor %}
+
+{% if paginate.pages > 1 and custom_ordering == false %}
+  <footer class="collection-listing--pagination">
+    <div class="spacing--3y"></div>
+    <div class="width--12 text-align--center">
+      {% include 'framework--pagination' %}
+    </div>
+  </footer>
+{% endif %}
+
+
+{% endpaginate %}

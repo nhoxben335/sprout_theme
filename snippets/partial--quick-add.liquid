@@ -1,0 +1,106 @@
+{% capture variants %}
+  <select name="id" id="quick-add--select--{{ product.id }}">
+    {% for variant in product.variants %}
+      <option
+        data-sku="{{ variant.sku }}"
+        {% if variant.inventory_quantity <= 0 and variant.available == false %}DISABLED {% endif %}
+        {% if variant == product.selected_or_first_available_variant %}
+          selected="selected"
+        {% endif %}
+        value="{{ variant.id }}"
+      >
+        {{ variant.title }} - {{ variant.price | money }}
+      </option>
+    {% endfor %}
+  </select>
+{% endcapture %}
+
+{% assign excerpt = product.metafields.global.description_tag %}
+{% if excerpt == blank %}
+  {% assign excerpt = product.description | strip_html | truncate: 100 %}
+{% endif %}
+
+{% assign url = product.url | within: collection %}
+
+
+{% if settings.product--show-quick-add-buttons %}
+
+<div
+  class="quick-add"
+  data-js-class="QuickAdd"
+  data-quick-add--id="{{ product.id }}"
+  data-quick-add--show-variants="{% if product.variants.size > 1 %}true{% else %}false{% endif %}"
+>
+  <script>
+    theme.quick_add.json_{{ product.id }} = {{ product | json }};
+  </script>
+
+  <form
+    class="quick-add--cart-form"
+    action="/cart/add"
+    method="post"
+    enctype="multipart/form-data"
+  >
+    <input type="hidden" name="quantity" value="1">
+
+    <div class="quick-add--add-button font--accent" tabindex="0" role="button">
+      <span class="text">{{ 'products.cart_button_text' | t }}</span>
+      <span class="fw--loading_animation tiny" data-js-class="FrameworkLoadingAnimation"></span>
+    </div>
+
+    <div class="quick-add--details">
+      <div class="quick-add--variants">
+        {{ variants }}
+
+        {% comment %} <!-- Using select-wrapper class to inherit styles -->
+        <div class="selector-wrapper">
+          <label for="quantity">Quantity</label>
+          <input id="quantity" type="number" name="quantity" min="1" value="1" style="width: 60px" />
+        </div>
+        {% endcomment %}
+      </div>
+
+
+      <div class="quick-add--sold-out">
+        <div class="quick-add--sold-out--variant">{{ 'products.sold_out.variant' | t }}</div>
+        <div class="quick-add--unavailable-variant">{{ 'products.unavailable_variant' | t }}</div>
+        {% if product.available == false %}
+          <div class="quick-add--sold-out--product">{{ 'products.sold_out.product' | t }}</div>
+        {% endif %}
+      </div>
+
+      <div class="quick-add--button-row">
+        {% if product.price > 0 %}
+          <div class="quick-add--price-wrapper">
+            {{ price_meta }}
+
+            <div class="quick-add--compare-price">
+              {% if product.compare_at_price > product.price %}
+                {{ product.compare_at_price | money }}
+              {% endif %}
+            </div>
+            <div class="quick-add--price font--accent" itemprop="price">{{ product.price | money }}</div>
+          </div>
+        {% endif %}
+
+        <div class="quick-add--button-wrapper">
+          <div class="quick-add--cancel-button font--block-link">
+            <div tabindex="0" role="button" class="">
+              {{ 'products.add_modal.cancel' | t }}
+            </div>
+          </div>
+
+          <button class="quick-add--confirm-button font--accent" type="submit">
+            <span class="text">{{ 'products.add_modal.ok' | t }}</span>
+            <span class="fw--loading_animation tiny" data-js-class="FrameworkLoadingAnimation">
+            </span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </form>
+
+</div>
+
+{% endif %}
