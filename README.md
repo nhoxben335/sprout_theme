@@ -1,4 +1,4 @@
-# sprout_theme
+# Sprout Therapy Website 
 
 Familiarized with e-commerce concepts, including product management, inventory, and order processing.
 
